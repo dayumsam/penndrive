@@ -1,6 +1,7 @@
 import os
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
+from moviepy.editor import *
 
 from dotenv import load_dotenv
 
@@ -20,12 +21,17 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def converter(filename):
+    video = VideoFileClip("./uploads/" + filename)
+    video.audio.write_audiofile("./uploads/audiofile.mp3")
+
+    # try catch delete video
 
 def transcribe(filename):
     fileInQuestion = open("./uploads/" + filename, "rb")
     transcript = openai.Audio.transcribe("whisper-1", fileInQuestion)
 
-    # try catch delete filename
+    # try catch delete audiofile
 
     print(transcript)
 
@@ -42,9 +48,10 @@ def upload_file():
             return 'No selected file'
 
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+            filename = "videofile.mp4"
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            transcribe(filename)
+            converter(filename)
+            transcribe("audiofile.mp3")
             return "Done!"
 
     return "hello"
