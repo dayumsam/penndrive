@@ -6,3 +6,4 @@ uploads/*
 
 .envsendgrid.env
 sendgrid.env
+sendgrid.env
