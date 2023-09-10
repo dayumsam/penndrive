@@ -174,7 +174,7 @@ def send_mail(summary, readings):
 
     print("Sending Emails")
 
-    email_content = '<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(
+    email_content = '<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some resources you can refer to </p></br>{1}'.format(
         summary, readings)
 
     response = openai.ChatCompletion.create(
