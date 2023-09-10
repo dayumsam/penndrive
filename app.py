@@ -146,9 +146,9 @@ def upload_file():
             converter(filename)
 
             transcript = run_transcription("audiofile.mp3")
-            print(transcript)
+            summary = generate_summary(transcript)
 
-            print(generate_summary(transcript))
+            print(summary)
 
             return "Done!"
 
