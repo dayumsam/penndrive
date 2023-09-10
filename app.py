@@ -1,4 +1,5 @@
-import os, csv
+import os
+import csv
 import base64
 
 from flask import Flask, flash, request, redirect, url_for
@@ -18,7 +19,8 @@ from metaphor_python import Metaphor
 
 ## EMAIL SENDING ##
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+from sendgrid.helpers.mail import (
+    Mail, Attachment, FileContent, FileName, FileType, Disposition)
 
 import openai
 
@@ -30,6 +32,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = os.getenv("FLASK_SECRET")
 
 load_dotenv()
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -138,6 +141,7 @@ def generate_summary(transcript):
 
     return response["choices"][0]["message"]["content"]
 
+
 def metaphor_ref(transcript):
     print("Generating Readings")
 
@@ -147,12 +151,13 @@ def metaphor_ref(transcript):
     search += " is this:"
     response = metaphor.search(search, num_results=5, use_autoprompt=False)
 
-    return(response)
+    return (response)
+
 
 def passCSv(sheet):
     # opening the CSV file
-    with open(sheet, mode ='r') as file:
-		
+    with open(sheet, mode='r') as file:
+
         # reading the CSV file
         csvFile = (csv.reader(file, delimiter=","))
         list_of_contacts = []
@@ -167,23 +172,26 @@ def passCSv(sheet):
 
 def send_mail(summary, readings):
 
-    email_content = '<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(summary,readings)
+    print("Sending Emails")
+
+    email_content = '<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(
+        summary, readings)
 
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
-            {"role": "user", "content": "You are a helpful assistant, your task is to format the following in html so that it can be emailed easily and is easy to read: {0}".format(
+            {"role": "user", "content": "You are a helpful assistant, your task is to format the following in html so that it can be emailed easily as a newsletter and is easy to read with bullet points, proper spacing, and formatting: {0}".format(
                 email_content)},
         ]
     )
 
     message = Mail(
-    from_email='jayminjhaveri10@gmail.com',
-    to_emails=passCSv("./uploads/people.csv"),
-    subject='Today\'s Meeting Summary',
-    html_content='<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(summary,readings))
+        from_email='jayminjhaveri10@gmail.com',
+        to_emails=passCSv("./uploads/people.csv"),
+        subject='Today\'s Meeting Summary',
+        html_content=response["choices"][0]["message"]["content"])
 
-    with open('./uploads/resources.zip', 'rb') as f:    
+    with open('./uploads/resources.zip', 'rb') as f:
         data = f.read()
         f.close()
         encoded_file = base64.b64encode(data).decode()
@@ -196,7 +204,6 @@ def send_mail(summary, readings):
     )
 
     message.attachment = attachedFile
-
 
     sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
     response = sg.send(message)
@@ -221,7 +228,7 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
 
             with ZipFile("./uploads/dispatch.zip", 'r') as zObject:
-                 zObject.extractall(path="./uploads")
+                zObject.extractall(path="./uploads")
 
             os.remove("./uploads/dispatch.zip")
 
@@ -234,9 +241,9 @@ def upload_file():
             send_mail(summary, readings)
 
             return "Done!"
-            
 
     return "hello"
+
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
