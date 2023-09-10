@@ -163,11 +163,22 @@ def passCSv(sheet):
 
 
 def send_mail(summary, readings):
+
+    email_content = '<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(summary,readings)
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "user", "content": "You are a helpful assistant, your task is to format the following in html so that it can be emailed easily and is easy to read: {0}".format(
+                email_content)},
+        ]
+    )
+
     message = Mail(
     from_email='jayminjhaveri10@gmail.com',
-    to_emails=passCSv(),
+    to_emails='dayumsam22@gmail.com',
     subject='Sending with Twilio SendGrid is Fun',
-    html_content='<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(summary,readings))
+    html_content=response["choices"][0]["message"]["content"])
 
     with open('./uploads/resources.zip', 'rb') as f:    
         data = f.read()
