@@ -154,12 +154,15 @@ def passCSv(sheet):
     with open(sheet, mode ='r') as file:
 		
         # reading the CSV file
-        csvFile = csv.DictReader(file)
-        list_of_contacts= list(csvFile)
+        csvFile = (csv.reader(file, delimiter=","))
+        list_of_contacts = []
 
-        # return list
+        fields = next(csvFile)
+        for row in csvFile:
+            row.pop(0)
+            list_of_contacts.append(row[0])
 
-        return list_of_contacts
+        return (list_of_contacts)
 
 
 def send_mail(summary, readings):
@@ -176,9 +179,9 @@ def send_mail(summary, readings):
 
     message = Mail(
     from_email='jayminjhaveri10@gmail.com',
-    to_emails='dayumsam22@gmail.com',
-    subject='Sending with Twilio SendGrid is Fun',
-    html_content=response["choices"][0]["message"]["content"])
+    to_emails=passCSv("./uploads/people.csv"),
+    subject='Today\'s Meeting Summary',
+    html_content='<h1>Hey!</h1></br><p>Here is what happened today:</p></br>{0}</br><p>Here are some readings you can refer to </p></br>{1}'.format(summary,readings))
 
     with open('./uploads/resources.zip', 'rb') as f:    
         data = f.read()
