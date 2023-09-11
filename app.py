@@ -247,6 +247,4 @@ def upload_file():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    # passCSv("./uploads/people.csv")
-    send_mail()
     return "ok"
